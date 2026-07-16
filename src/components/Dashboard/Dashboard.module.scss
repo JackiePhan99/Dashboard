@@ -1,0 +1,427 @@
+// ============================================================
+// PALETTE — Color definitions
+// ============================================================
+$bg: #F3F5F8;
+$card: #FFFFFF;
+$ink: #161A23;
+$sub: #6B7280;
+$faint: #9CA3AF;
+$border: #E7EAF0;
+$teal: #0E7C66;
+$tealSoft: #E4F4EF;
+$amber: #C97A2B;
+$amberSoft: #FBEEDE;
+$indigo: #4338CA;
+$rose: #B4444B;
+$roseSoft: #F8E9EA;
+
+// ============================================================
+// MAIN CONTAINER
+// ============================================================
+.container {
+  background: $bg;
+  min-height: 100%;
+  padding: 32px 32px 40px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  color: $ink;
+}
+
+// ============================================================
+// HEADER
+// ============================================================
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.headerTitle {
+  h1 {
+    font-size: 25px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.5px;
+  }
+
+  p {
+    color: $sub;
+    font-size: 13.5px;
+    margin: 5px 0 0;
+  }
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.statusSync {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: $faint;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+// ============================================================
+// STATUS PILL
+// ============================================================
+.statusPill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.live {
+  background: $tealSoft;
+  color: $teal;
+}
+
+.error {
+  background: $roseSoft;
+  color: $rose;
+}
+
+.empty {
+  background: $amberSoft;
+  color: $amber;
+}
+
+.notConnected {
+  background: $amberSoft;
+  color: $amber;
+}
+
+// ============================================================
+// BOX COMPONENT
+// ============================================================
+.box {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
+  padding: 20px 22px;
+}
+
+.boxTitle {
+  font-weight: 600;
+  font-size: 14.5px;
+  margin-bottom: 14px;
+  color: $ink;
+  letter-spacing: -0.1px;
+}
+
+// ============================================================
+// METRIC BOX
+// ============================================================
+.metricBox {
+  flex: 1;
+  min-width: 190px;
+  background: $card;
+  border-radius: 16px;
+  border: 1px solid $border;
+  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.metricIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metricContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.metricLabel {
+  font-size: 12.5px;
+  color: $sub;
+  font-weight: 600;
+  margin-bottom: 5px;
+  letter-spacing: 0.2px;
+}
+
+.metricValue {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  color: $ink;
+  letter-spacing: -0.3px;
+}
+
+// ============================================================
+// METRICS ROW
+// ============================================================
+.metricsRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+// ============================================================
+// KPI BOX
+// ============================================================
+.kpiBox {
+  flex: 1;
+  min-width: 230px;
+  padding: 18px 20px;
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
+}
+
+.kpiHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.kpiIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $amberSoft;
+}
+
+.kpiLabel {
+  font-size: 12.5px;
+  color: $sub;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.kpiContent {
+  display: flex;
+  gap: 10px;
+}
+
+.kpiMetric {
+  flex: 1;
+  background: $bg;
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.kpiMetricLabel {
+  font-size: 11px;
+  color: $sub;
+  margin-bottom: 4px;
+}
+
+.kpiMetricValue {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+// ============================================================
+// CHARTS ROW
+// ============================================================
+.chartsRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.chartBox {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
+
+  // Allow pie labels to overflow a bit without being clipped
+  overflow: visible;
+}
+
+.areaChart {
+  flex: 2;
+  min-width: 360px;
+  padding: 20px 22px;
+}
+
+.pieChart {
+  flex: 1;
+  min-width: 270px;
+  padding: 20px 22px;
+}
+
+.pieWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pieLegend {
+  width: 38%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pieChart svg {
+  overflow: visible;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.pieLabelOuter {
+  fill: #123;
+  font-size: 12px;
+}
+
+.pieLabelLine {
+  stroke: #9AA3AD;
+  stroke-width: 1;
+  fill: none;
+}
+
+// ============================================================
+// TABLE
+// ============================================================
+.tableBox {
+  padding: 20px 22px;
+}
+
+.tableContainer {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.tableHead {
+  text-align: left;
+  color: $faint;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.tableHeadCell {
+  padding: 0 8px 10px;
+  font-weight: 600;
+}
+
+.tableHeadCellRight {
+  text-align: right;
+}
+
+.tableBody {
+  tr {
+    border-top: 1px solid $border;
+  }
+}
+
+.tableRow {
+  border-top: 1px solid $border;
+}
+
+.tableCellIndex {
+  padding: 10px 8px;
+  color: $faint;
+  font-size: 12.5px;
+}
+
+.tableCellCustomer {
+  padding: 10px 8px;
+  font-weight: 600;
+}
+
+.tableCellRevenue {
+  padding: 10px 8px;
+  text-align: right;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+
+.tableCellBar {
+  padding: 10px 8px;
+}
+
+.barBackground {
+  background: $tealSoft;
+  border-radius: 4px;
+  height: 7px;
+  width: 100%;
+}
+
+.barFill {
+  background: $teal;
+  border-radius: 4px;
+  height: 7px;
+}
+
+// ============================================================
+// ERROR STATE
+// ============================================================
+.errorBox {
+  padding: 40px 28px;
+  text-align: center;
+}
+
+.errorIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  background: $amberSoft;
+}
+
+.errorTitle {
+  font-weight: 700;
+  font-size: 15.5px;
+  margin-bottom: 8px;
+}
+
+.errorMessage {
+  color: $sub;
+  font-size: 13.5px;
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 0 auto;
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+}

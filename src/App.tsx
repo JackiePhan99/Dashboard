@@ -1,12 +1,10 @@
 import './App.css'
-import { Calendar } from './components/Calendar/Calendar';
-import { Card } from './components/Card/Card';
+import Dashboard from './components/Dashboard/Dashboard';
 
 function App() {
   return (
     <>
-      <Calendar />
-      <Card />
+      <Dashboard />
     </>
   )
 }
