@@ -286,6 +286,33 @@ $roseSoft: #F8E9EA;
   overflow: visible;
 }
 
+// ============================================================
+// MONTHLY CHART TOOLTIP (Doanh thu / Gross profit)
+// ============================================================
+.monthlyTooltip {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.15);
+}
+
+.monthlyTooltipLabel {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: $ink;
+}
+
+.monthlyTooltipRow {
+  font-weight: 500;
+  white-space: nowrap;
+
+  & + & {
+    margin-top: 4px;
+  }
+}
+
 .legendItem {
   display: flex;
   align-items: center;
@@ -296,17 +323,6 @@ $roseSoft: #F8E9EA;
   width: 12px;
   height: 12px;
   border-radius: 50%;
-}
-
-.pieLabelOuter {
-  fill: #123;
-  font-size: 12px;
-}
-
-.pieLabelLine {
-  stroke: #9AA3AD;
-  stroke-width: 1;
-  fill: none;
 }
 
 // ============================================================

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  AreaChart, Area, PieChart, Pie, Cell,
+  ComposedChart, Area, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
 import { RefreshCw, CheckCircle2, AlertCircle, Link2, Wallet, Receipt, TrendingUp, Percent } from "lucide-react";
 import styles from "./Dashboard.module.scss";
-import { FONT_IMPORT, FONT_FAMILIES, PALETTE, SALE_COLORS } from "../../utils/constants";
+import { FONT_IMPORT, PALETTE, SALE_COLORS } from "../../utils/constants";
 import { parseSheet } from "../../utils/csvParser";
 
 // ============================================================
@@ -138,6 +138,7 @@ export default function PnlDashboard() {
     let postRevSum = 0;
     let postGrossSum = 0;
     const byMonth: Record<string, number> = {};
+    const byMonthGross: Record<string, number> = {};
     const bySale: Record<string, { total: number; count: number; name: string }> = {};
     const byCustomer: Record<string, number> = {};
 
@@ -179,6 +180,7 @@ export default function PnlDashboard() {
       if (!Number.isNaN(d.getTime())) {
         const key = `T${d.getMonth() + 1}`;
         byMonth[key] = (byMonth[key] || 0) + revenue;
+        byMonthGross[key] = (byMonthGross[key] || 0) + gross;
       }
 
       // Normalize BD name and apply canonical display names inferred from parsed values
@@ -194,7 +196,9 @@ export default function PnlDashboard() {
     });
 
     const monthOrder = Array.from({ length: 12 }, (_, i) => `T${i + 1}`);
-    const monthlyData = monthOrder.filter((m) => byMonth[m]).map((m) => ({ thang: m, doanh_thu: byMonth[m] }));
+    const monthlyData = monthOrder
+      .filter((m) => byMonth[m])
+      .map((m) => ({ thang: m, doanh_thu: byMonth[m], gross_profit: byMonthGross[m] || 0 }));
     const TOP_N_SALES = 3;
     const saleDataFull = Object.entries(bySale)
       .map(([, v]) => ({ name: v.name, value: v.total, count: v.count, fraction: grossSum ? (v.total / grossSum) : 0 }))
@@ -312,9 +316,9 @@ export default function PnlDashboard() {
           </div>
 
           <div className={styles.chartsRow}>
-            <Box className={`${styles.chartBox} ${styles.areaChart}`} title="Doanh thu theo từng tháng">
+            <Box className={`${styles.chartBox} ${styles.areaChart}`} title="Doanh thu / Gross profit theo từng tháng">
               <ResponsiveContainer width="100%" height={230}>
-                <AreaChart data={stats.monthlyData}>
+                <ComposedChart data={stats.monthlyData}>
                   <defs>
                     <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor={PALETTE.teal} stopOpacity={0.3} />
@@ -324,9 +328,39 @@ export default function PnlDashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.border} vertical={false} />
                   <XAxis dataKey="thang" tick={{ fontSize: 12, fill: PALETTE.sub }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: PALETTE.sub }} axisLine={false} tickLine={false} tickFormatter={(v) => (v / 1000000).toFixed(0) + "tr"} />
-                  <Tooltip formatter={(v) => fmtVND(v as number)} contentStyle={{ borderRadius: 10, border: `1px solid ${PALETTE.border}`, fontSize: 13, boxShadow: "0 8px 20px -8px rgba(0,0,0,0.15)" }} />
-                  <Area type="monotone" dataKey="doanh_thu" name="Doanh thu" stroke={PALETTE.teal} fill="url(#revFill)" strokeWidth={2.5} />
-                </AreaChart>
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (!active || !payload || !payload.length) return null;
+                      const revenueEntry = payload.find((p) => p.dataKey === "doanh_thu");
+                      const grossEntry = payload.find((p) => p.dataKey === "gross_profit");
+                      return (
+                        <div className={styles.monthlyTooltip}>
+                          <div className={styles.monthlyTooltipLabel}>{label}</div>
+                          {revenueEntry && (
+                            <div className={styles.monthlyTooltipRow} style={{ color: PALETTE.teal }}>
+                              Doanh thu : {fmtVND(revenueEntry.value as number)}
+                            </div>
+                          )}
+                          {grossEntry && (
+                            <div className={styles.monthlyTooltipRow} style={{ color: PALETTE.indigo }}>
+                              Gross profit : {fmtVND(grossEntry.value as number)}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    align="left"
+                    iconType="circle"
+                    iconSize={8}
+                    wrapperStyle={{ fontSize: 12.5, paddingTop: 8 }}
+                    formatter={(value) => (value === "doanh_thu" ? "Doanh thu" : "Gross profit")}
+                  />
+                  <Area type="monotone" dataKey="doanh_thu" name="doanh_thu" stroke={PALETTE.teal} fill="url(#revFill)" strokeWidth={2.5} dot={{ r: 3, fill: PALETTE.teal, strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                  <Line type="monotone" dataKey="gross_profit" name="gross_profit" stroke={PALETTE.indigo} strokeWidth={2.5} dot={{ r: 3, fill: PALETTE.indigo, strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                </ComposedChart>
               </ResponsiveContainer>
             </Box>
 

@@ -2,6 +2,10 @@
 // CSV PARSING & DATA UTILITIES
 // ============================================================
 
+// Vị trí cột cố định theo đúng sheet thật (0-based: A=0, B=1, C=2 ...)
+// D=3 Tên công ty/đối tác · E=4 Ngày ký HĐ · J=9 Giá trị HĐ (Chưa VAT) Pre PNL
+// L=11 Gross Profit Pre PNL · M=12 BD PIC · O=14 Giá trị HĐ (Chưa VAT) Post PNL
+// Q=16 Gross Profit Post PNL
 export const CSV_COLUMN_INDEXES = {
   orderId: 0,
   company: 3,
@@ -72,39 +76,4 @@ export function parseSheet(csvText: string, columnIndexes = CSV_COLUMN_INDEXES, 
   }
 
   return rows;
-}
-
-/**
- * Tìm dòng bắt đầu dữ liệu thực sự trong CSV từ Google Sheets
- * Dòng dữ liệu thường bắt đầu từ ORDER_ID hoặc một định danh duy nhất
- */
-export function findDataStartRow(csvText: string, expectedHeaderKeywords: string[] = ["ORDER_ID", "order", "id"]): number {
-  const lines = csvText.replace(/\r/g, "").split("\n");
-
-  for (let i = 0; i < Math.min(lines.length, 10); i++) {
-    const cells = splitCSVLine(lines[i]);
-    const cellsText = cells.join(" ").toLowerCase();
-    const hasKeywords = expectedHeaderKeywords.some(keyword => cellsText.includes(keyword.toLowerCase()));
-    if (hasKeywords) {
-      console.log(`✓ Header found at row ${i}:`, cells);
-      return i + 1;
-    }
-  }
-
-  console.warn("⚠ Could not find header row automatically. Using default row 3");
-  return 3;
-}
-
-/**
- * Debug: In ra 10 dòng đầu tiên của CSV để xem cấu trúc
- */
-export function debugCSVRows(csvText: string, numRows: number = 10) {
-  const lines = csvText.replace(/\r/g, "").split("\n");
-  console.group("📋 CSV Debug - First rows:");
-
-  for (let i = 0; i < Math.min(lines.length, numRows); i++) {
-    const cells = splitCSVLine(lines[i]);
-    console.log(`Row ${i}:`, cells);
-  }
-  console.groupEnd();
 }
