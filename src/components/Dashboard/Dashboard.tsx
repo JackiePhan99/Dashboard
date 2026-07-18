@@ -55,20 +55,6 @@ function Box({ children, style, title, className }: { children: React.ReactNode;
   );
 }
 
-function MetricBox({ icon: Icon, label, value, accent, className }: { icon: React.ElementType; label: string; value: string; accent: string; className?: string }) {
-  return (
-    <div className={`${styles.metricBox} ${className || ""}`}>
-      <div className={styles.metricIcon} style={{ backgroundColor: `${accent}1A` }}>
-        <Icon size={18} color={accent} strokeWidth={2.2} />
-      </div>
-      <div className={styles.metricContent}>
-        <div className={styles.metricLabel}>{label}</div>
-        <div className={styles.metricValue}>{value}</div>
-      </div>
-    </div>
-  );
-}
-
 export default function PnlDashboard() {
   const [rows, setRows] = useState<Array<{
     id: string;
@@ -93,7 +79,7 @@ export default function PnlDashboard() {
   const [isEditingKpi, setIsEditingKpi] = useState(false);
   const [kpiInput, setKpiInput] = useState(String(kpiTarget));
 
-  // State gạt cột mốc biểu đồ: 'detailed' (100tr-200tr) hoặc 'wide' (500tr-1 tỷ)
+  // State gạt cột mốc biểu đồ: 'detailed' (200tr-400tr) hoặc 'wide' (500tr-1 tỷ)
   const [chartStepMode, setChartStepMode] = useState<'detailed' | 'wide'>('wide');
 
   const handleKpiTargetChange = (val: number) => {
@@ -180,9 +166,7 @@ export default function PnlDashboard() {
       preGrossSum += r.grossPre;
       
       postGrossSum += r.grossPost; 
-      if (r.netPost) {
-        postRevSum += r.netPost;
-      }
+      postRevSum += r.netPost; // Tính tổng doanh thu Post (Cột P Chưa VAT)
 
       if (r.month) {
         const key = `T${r.month}`;
@@ -226,6 +210,7 @@ export default function PnlDashboard() {
       grossSum,
       preGrossSum,
       postGrossSum,
+      postRevSum,
       kpiPre: preRevSum ? (preGrossSum / preRevSum) * 100 : 0,
       kpiPost: postRevSum ? (postGrossSum / postRevSum) * 100 : 0,
       monthlyData,
@@ -234,9 +219,8 @@ export default function PnlDashboard() {
     };
   }, [rows]);
 
-  // Bộ tính toán trục dọc Y-Axis dựa trên mốc gạt tùy chỉnh
   const yAxisTicks = useMemo(() => {
-    if (!stats || !stats.monthlyData.length) return [];
+    if (!stats || !stats.monthlyData.length) return { ticks: [], max: 0 };
     const maxVal = Math.max(...stats.monthlyData.map(d => d.doanh_thu));
     
     let step = 500000000;
@@ -252,7 +236,7 @@ export default function PnlDashboard() {
     for (let v = 0; v <= roundedMax; v += step) {
       ticks.push(v);
     }
-    return ticks;
+    return { ticks, max: roundedMax };
   }, [stats, chartStepMode]);
 
   const fmtVND = (n: number) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(n);
@@ -290,13 +274,32 @@ export default function PnlDashboard() {
         <>
           <div className={styles.metricsRow}>
             {/* Block 1: DOANH THU */}
-            <MetricBox 
-              icon={Wallet} 
-              label="DOANH THU" 
-              value={fmtVND(stats.revenueSum)} 
-              accent={PALETTE.teal} 
-              className={styles.revenueBox} 
-            />
+            <div className={styles.metricBoxSplit}>
+              <div className={styles.metricIcon} style={{ backgroundColor: `${PALETTE.teal}1A` }}>
+                <Wallet size={18} color={PALETTE.teal} strokeWidth={2.2} />
+              </div>
+              <div className={styles.splitContent}>
+                <div className={styles.splitCol}>
+                  <div className={styles.metricLabel}>PRE REVENUE</div>
+                  <div className={styles.unifiedValue} style={{ marginTop: '14px' }}>
+                    {fmtVND(stats.revenueSum)}
+                  </div>
+                  <div style={{ fontSize: '11px', color: PALETTE.sub, marginTop: '10px' }}>
+                    Chưa VAT
+                  </div>
+                </div>
+                <div className={styles.splitDivider} />
+                <div className={styles.splitCol}>
+                  <div className={styles.metricLabel}>POST REVENUE</div>
+                  <div className={styles.unifiedValue} style={{ marginTop: '14px', color: PALETTE.teal }}>
+                    {fmtVND(stats.postRevSum)}
+                  </div>
+                  <div style={{ fontSize: '11px', color: PALETTE.sub, marginTop: '10px' }}>
+                    Chưa VAT
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Block 2: CHI PHÍ */}
             <div className={styles.metricBoxSplit}>
@@ -306,7 +309,7 @@ export default function PnlDashboard() {
               <div className={styles.splitContent}>
                 <div className={styles.splitCol}>
                   <div className={styles.metricLabel}>CHI PHÍ VẬN HÀNH</div>
-                  <div className={styles.metricValue} style={{ marginTop: '14px' }}>
+                  <div className={styles.unifiedValue} style={{ marginTop: '14px' }}>
                     {fmtVND(stats.costSum)}
                   </div>
                   <div style={{ fontSize: '11px', color: PALETTE.sub, marginTop: '10px' }}>
@@ -316,11 +319,11 @@ export default function PnlDashboard() {
                 <div className={styles.splitDivider} />
                 <div className={styles.splitCol}>
                   <div className={styles.metricLabel}>CHI PHÍ DỰ ÁN</div>
-                  <div className={styles.metricValue} style={{ marginTop: '14px' }}>
+                  <div className={styles.unifiedValue} style={{ marginTop: '14px' }}>
                     {fmtVND(stats.costSum)}
                   </div>
                   <div style={{ fontSize: '11px', color: PALETTE.sub, marginTop: '10px' }}>
-                    Tự động (Doanh thu - GP)
+                    Tạm tính (Bằng CP dự án)
                   </div>
                 </div>
               </div>
@@ -334,7 +337,7 @@ export default function PnlDashboard() {
               <div className={styles.splitContent}>
                 <div className={styles.splitCol}>
                   <div className={styles.metricLabel}>PRE GROSS PROFIT</div>
-                  <div className={styles.metricValue} style={{ marginTop: '14px' }}>
+                  <div className={styles.unifiedValue} style={{ marginTop: '14px' }}>
                     {fmtVND(stats.preGrossSum)}
                   </div>
                   <div style={{ fontSize: '11px', color: PALETTE.sub, marginTop: '10px' }}>
@@ -344,7 +347,7 @@ export default function PnlDashboard() {
                 <div className={styles.splitDivider} />
                 <div className={styles.splitCol}>
                   <div className={styles.metricLabel}>POST GROSS PROFIT</div>
-                  <div className={styles.metricValue} style={{ marginTop: '14px', color: PALETTE.indigo }}>
+                  <div className={styles.unifiedValue} style={{ marginTop: '14px', color: PALETTE.indigo }}>
                     {fmtVND(stats.postGrossSum)}
                   </div>
                   <div style={{ fontSize: '11px', color: PALETTE.sub, marginTop: '10px' }}>
@@ -354,13 +357,12 @@ export default function PnlDashboard() {
               </div>
             </div>
 
-            {/* Block 4: KPI */}
-            <Box className={styles.kpiBox}>
+            {/* Block 4: KPI (Thêm style in đậm fontWeight: "bold" cho % HOÀN THÀNH) */}
+            <div className={styles.metricBoxSplit}>
               <div className={styles.kpiHeader}>
                 <div className={styles.kpiIcon}>
                   <Percent size={18} color={PALETTE.amber} strokeWidth={2.2} />
                 </div>
-                <div className={styles.kpiLabel}>% KPI BIÊN LỢI NHUẬN</div>
               </div>
               <div className={styles.splitContent}>
                 <div className={styles.splitCol} style={{ position: "relative", minHeight: "85px" }}>
@@ -397,7 +399,7 @@ export default function PnlDashboard() {
                     </div>
                   ) : (
                     <div className={styles.kpiValueRow}>
-                      <div className={styles.metricValue}>{fmtVND(kpiTarget)}</div>
+                      <div className={styles.unifiedValue}>{fmtVND(kpiTarget)}</div>
                     </div>
                   )}
 
@@ -423,7 +425,7 @@ export default function PnlDashboard() {
                 
                 <div className={styles.splitCol} style={{ textAlign: "center" }}>
                   <div className={styles.metricLabel}>% HOÀN THÀNH</div>
-                  <div className={styles.kpiMetricValue} style={{ color: PALETTE.amber, fontSize: "20px", marginTop: "14px" }}>
+                  <div className={styles.kpiMetricValue} style={{ color: PALETTE.amber, fontSize: "20px", marginTop: "14px", fontWeight: "bold" }}>
                     {kpiTarget > 0 ? fmtPct((stats.postGrossSum / kpiTarget) * 100) : "0%"}
                   </div>
                   <div style={{ fontSize: '11px', color: PALETTE.sub, marginTop: '10px' }}>
@@ -431,11 +433,11 @@ export default function PnlDashboard() {
                   </div>
                 </div>
               </div>
-            </Box>
+            </div>
           </div>
 
           <div className={styles.chartsRow}>
-            {/* Biểu đồ tháng (Sử dụng thêm thuộc tính key để ép Recharts vẽ lại mốc khi chọn nút gạt) */}
+            {/* Biểu đồ tháng */}
             <Box className={`${styles.chartBox} ${styles.areaChart}`}>
               <div className={styles.chartHeader}>
                 <div className={styles.boxTitle} style={{ marginBottom: 0 }}>
@@ -446,7 +448,7 @@ export default function PnlDashboard() {
                     className={`${styles.toggleBtn} ${chartStepMode === 'detailed' ? styles.toggleBtnActive : ''}`}
                     onClick={() => setChartStepMode('detailed')}
                   >
-                    Mốc 100tr - 200tr
+                    Mốc 200tr - 400tr
                   </button>
                   <button 
                     className={`${styles.toggleBtn} ${chartStepMode === 'wide' ? styles.toggleBtnActive : ''}`}
@@ -457,72 +459,74 @@ export default function PnlDashboard() {
                 </div>
               </div>
 
-              <ResponsiveContainer width="100%" height={230}>
-                <ComposedChart key={chartStepMode} data={stats.monthlyData}>
-                  <defs>
-                    <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={PALETTE.teal} stopOpacity={0.3} />
-                      <stop offset="100%" stopColor={PALETTE.teal} stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.border} vertical={false} />
-                  <XAxis dataKey="thang" tick={{ fontSize: 12, fill: PALETTE.sub }} axisLine={false} tickLine={false} />
-                  <YAxis 
-                    ticks={yAxisTicks}
-                    domain={[0, 'auto']}
-                    tick={{ fontSize: 11, fill: PALETTE.sub }} 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tickFormatter={(v) => (v / 1000000).toFixed(0) + "tr"} 
-                  />
-                  <Tooltip
-                    content={({ active, payload, label }) => {
-                      if (!active || !payload || !payload.length) return null;
-                      const revenueEntry = payload.find((p) => p.dataKey === "doanh_thu");
-                      const grossEntry = payload.find((p) => p.dataKey === "gross_profit");
-                      return (
-                        <div className={styles.monthlyTooltip}>
-                          <div className={styles.monthlyTooltipLabel}>{label}</div>
-                          {revenueEntry && (
-                            <div className={styles.monthlyTooltipRow} style={{ color: PALETTE.teal }}>
-                              Doanh thu : {fmtVND(revenueEntry.value as number)}
-                            </div>
-                          )}
-                          {grossEntry && (
-                            <div className={styles.monthlyTooltipRow} style={{ color: PALETTE.indigo }}>
-                              Gross profit : {fmtVND(grossEntry.value as number)}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    }}
-                  />
-                  <Legend
-                    verticalAlign="bottom"
-                    align="center"
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{ fontSize: 12.5, paddingTop: 8 }}
-                    formatter={(value) => (value === "doanh_thu" ? "Doanh thu" : "Gross profit")}
-                  />
-                  <Area type="monotone" dataKey="doanh_thu" name="doanh_thu" stroke={PALETTE.teal} fill="url(#revFill)" strokeWidth={2.5} dot={{ r: 3, fill: PALETTE.teal, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                  <Line type="monotone" dataKey="gross_profit" name="gross_profit" stroke={PALETTE.indigo} strokeWidth={2.5} dot={{ r: 3, fill: PALETTE.indigo, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                </ComposedChart>
-              </ResponsiveContainer>
+              <div className={styles.chartWrapper}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart key={chartStepMode} data={stats.monthlyData}>
+                    <defs>
+                      <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={PALETTE.teal} stopOpacity={0.3} />
+                        <stop offset="100%" stopColor={PALETTE.teal} stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.border} vertical={false} />
+                    <XAxis dataKey="thang" tick={{ fontSize: 12, fill: PALETTE.sub }} axisLine={false} tickLine={false} />
+                    <YAxis 
+                      key={chartStepMode} 
+                      ticks={yAxisTicks.ticks}
+                      domain={[0, yAxisTicks.max]} 
+                      interval={0} 
+                      tick={{ fontSize: 10, fill: PALETTE.sub }} 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tickFormatter={(v) => (v / 1000000).toFixed(0) + "tr"} 
+                    />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        if (!active || !payload || !payload.length) return null;
+                        const revenueEntry = payload.find((p) => p.dataKey === "doanh_thu");
+                        const grossEntry = payload.find((p) => p.dataKey === "gross_profit");
+                        return (
+                          <div className={styles.monthlyTooltip}>
+                            <div className={styles.monthlyTooltipLabel}>{label}</div>
+                            {revenueEntry && (
+                              <div className={styles.monthlyTooltipRow} style={{ color: PALETTE.teal }}>
+                                Doanh thu : {fmtVND(revenueEntry.value as number)}
+                              </div>
+                            )}
+                            {grossEntry && (
+                              <div className={styles.monthlyTooltipRow} style={{ color: PALETTE.indigo }}>
+                                Gross profit : {fmtVND(grossEntry.value as number)}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      align="center"
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ fontSize: 12.5, paddingTop: 8 }}
+                      formatter={(value) => (value === "doanh_thu" ? "Doanh thu" : "Gross profit")}
+                    />
+                    <Area type="monotone" dataKey="doanh_thu" name="doanh_thu" stroke={PALETTE.teal} fill="url(#revFill)" strokeWidth={2.5} dot={{ r: 3, fill: PALETTE.teal, strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="gross_profit" name="gross_profit" stroke={PALETTE.indigo} strokeWidth={2.5} dot={{ r: 3, fill: PALETTE.indigo, strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
             </Box>
 
             <Box className={`${styles.chartBox} ${styles.pieChart}`} title="Tỉ trọng đóng góp Gross Profit theo từng sale">
               <div className={styles.pieWrapper}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <ResponsiveContainer width="100%" height={230}>
+                <div className={styles.chartWrapper}>
+                  <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       {
                         (() => {
-                          // Định dạng nhãn % cố định ở tâm lát bánh để loại bỏ lỗi nhấp nháy hoặc ẩn đi khi di chuột (hover)
                           const renderLabel = ({ cx, cy, midAngle, percent }: any) => {
                             if (percent === undefined || percent === null || percent < 0.01) return null;
                             const RADIAN = Math.PI / 180;
-                            // Bán kính tĩnh cố định ở giữa lòng các lát bánh (bán kính trong 44 + bán kính ngoài 92) / 2 = 68
                             const radius = 68; 
                             const x = cx + radius * Math.cos(-midAngle * RADIAN);
                             const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -536,7 +540,7 @@ export default function PnlDashboard() {
                                 fontWeight="bold" 
                                 textAnchor="middle" 
                                 dominantBaseline="central"
-                                pointerEvents="none" // Loại bỏ bắt sự kiện hover của text để tránh nhấp nháy mất chữ
+                                pointerEvents="none" 
                               >
                                 {`${Math.round(percent * 100)}%`}
                               </text>
