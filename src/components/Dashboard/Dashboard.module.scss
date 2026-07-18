@@ -22,8 +22,26 @@ $roseSoft: #F8E9EA;
   background: $bg;
   min-height: 100%;
   padding: 32px 32px 40px;
-  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
   color: $ink;
+}
+
+// Bỏ hoàn toàn các đường viền đen/xanh (Focus outline) khi nhấp chọn (click) vào các phần tử của biểu đồ
+:global {
+  .recharts-wrapper,
+  .recharts-surface,
+  .recharts-sector,
+  .recharts-curve,
+  .recharts-active-dot,
+  .recharts-pie,
+  path,
+  svg,
+  g {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
 }
 
 // ============================================================
@@ -65,7 +83,7 @@ $roseSoft: #F8E9EA;
   gap: 6px;
   font-size: 12.5px;
   color: $faint;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
 }
 
 // ============================================================
@@ -121,10 +139,10 @@ $roseSoft: #F8E9EA;
 }
 
 // ============================================================
-// METRIC BOX
+// METRIC BOX (Chuẩn hóa line-height để số tiền hiển thị đồng đều)
 // ============================================================
 .metricBox {
-  flex: 1;
+  flex: 1.2;
   min-width: 190px;
   background: $card;
   border-radius: 16px;
@@ -134,6 +152,11 @@ $roseSoft: #F8E9EA;
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.revenueBox {
+  flex: 0.8 !important;
+  min-width: 170px !important;
 }
 
 .metricIcon {
@@ -151,19 +174,178 @@ $roseSoft: #F8E9EA;
 }
 
 .metricLabel {
-  font-size: 12.5px;
+  font-size: 11px;
   color: $sub;
   font-weight: 600;
   margin-bottom: 5px;
   letter-spacing: 0.2px;
 }
 
+// Thống nhất font-size, line-height của số tiền trên toàn bộ block chính
 .metricValue {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 23px;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 20px !important; 
+  font-weight: 700 !important;
+  line-height: 1.2 !important; // Khắc phục tình trạng chữ số Doanh Thu bị cao hơn các bên khác
+  color: $ink !important;
+  letter-spacing: -0.3px !important;
+}
+
+// ============================================================
+// SPLIT LAYOUTS
+// ============================================================
+.metricBoxSplit {
+  flex: 1.8;
+  min-width: 320px;
+  background: $card;
+  border-radius: 16px;
+  border: 1px solid $border;
+  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.splitContent {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.splitCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.splitDivider {
+  width: 1px;
+  background: $border;
+  align-self: stretch;
+  margin: 4px 0;
+}
+
+// KPI EDIT - Thiết kế căn chỉnh
+.kpiValueRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.kpiEditRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.kpiInlineInput {
+  width: 100%;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13.5px;
   font-weight: 700;
   color: $ink;
-  letter-spacing: -0.3px;
+  background: $bg;
+  outline: none;
+  font-family: inherit;
+
+  &:focus {
+    border-color: $teal;
+  }
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+.kpiSaveButton {
+  background: $teal;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+// Cố định nút sửa KPI ở góc dưới cùng bên phải cột mục tiêu (trước thanh ngăn cách dọc)
+.kpiEditButtonCorner {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $sub;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $border;
+    color: $ink;
+  }
+}
+
+// Khung nhập liệu
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-top: 6px;
+  margin-bottom: 4px;
+  transition: border-color 0.15s ease;
+
+  &:focus-within {
+    border-color: $teal;
+  }
+
+  input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 700;
+    color: $ink;
+    outline: none;
+    padding: 0;
+    
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield;
+  }
+
+  span {
+    font-size: 12px;
+    color: $sub;
+    font-weight: 600;
+  }
 }
 
 // ============================================================
@@ -180,8 +362,8 @@ $roseSoft: #F8E9EA;
 // KPI BOX
 // ============================================================
 .kpiBox {
-  flex: 1;
-  min-width: 230px;
+  flex: 1.5;
+  min-width: 280px;
   padding: 18px 20px;
   background: $card;
   border: 1px solid $border;
@@ -207,7 +389,7 @@ $roseSoft: #F8E9EA;
 }
 
 .kpiLabel {
-  font-size: 12.5px;
+  font-size: 12px;
   color: $sub;
   font-weight: 600;
   letter-spacing: 0.2px;
@@ -233,7 +415,8 @@ $roseSoft: #F8E9EA;
 }
 
 .kpiMetricValue {
-  font-size: 19px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 20px; 
   font-weight: 700;
 }
 
@@ -252,8 +435,6 @@ $roseSoft: #F8E9EA;
   border: 1px solid $border;
   border-radius: 16px;
   box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
-
-  // Allow pie labels to overflow a bit without being clipped
   overflow: visible;
 }
 
@@ -261,6 +442,47 @@ $roseSoft: #F8E9EA;
   flex: 2;
   min-width: 360px;
   padding: 20px 22px;
+}
+
+// HEADER BIỂU ĐỒ - Thanh tiêu đề chứa nút chọn mốc hiển thị
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chartToggleGroup {
+  display: flex;
+  background: $bg;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid $border;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  color: $sub;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+.toggleBtnActive {
+  background: $card;
+  color: $ink;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .pieChart {
@@ -287,7 +509,7 @@ $roseSoft: #F8E9EA;
 }
 
 // ============================================================
-// MONTHLY CHART TOOLTIP (Doanh thu / Gross profit)
+// MONTHLY CHART TOOLTIP
 // ============================================================
 .monthlyTooltip {
   background: $card;
@@ -326,7 +548,7 @@ $roseSoft: #F8E9EA;
 }
 
 // ============================================================
-// TABLE
+// TABLE (Cố định tiêu đề bảng khi cuộn trang)
 // ============================================================
 .tableBox {
   padding: 20px 22px;
@@ -351,9 +573,15 @@ $roseSoft: #F8E9EA;
   letter-spacing: 0.4px;
 }
 
+// Class cấu hình fixed sticky tiêu đề
 .tableHeadCell {
-  padding: 0 8px 10px;
+  position: sticky;
+  top: 0;
+  background: $card !important; // Cần dùng màu card để đè dữ liệu khi cuộn lên
+  z-index: 10;
+  padding: 10px 8px;
   font-weight: 600;
+  box-shadow: inset 0 -1px 0 $border; // Tạo đường kẻ viền dưới cố định không bị mờ khi scroll
 }
 
 .tableHeadCellRight {
@@ -384,7 +612,7 @@ $roseSoft: #F8E9EA;
 .tableCellRevenue {
   padding: 10px 8px;
   text-align: right;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important; // Đồng nhất font
   font-size: 13px;
 }
 
@@ -436,8 +664,5 @@ $roseSoft: #F8E9EA;
   line-height: 1.7;
   max-width: 480px;
   margin: 0 auto;
-
-  code {
-    font-family: 'IBM Plex Mono', monospace;
-  }
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important; // Đồng nhất font
 }
