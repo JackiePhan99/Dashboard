@@ -1,0 +1,52 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.panel {
+  width: 100%;
+  max-width: 380px;
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 20px;
+  border-radius: var(--radius-md);
+  background: var(--color-ink);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  color: var(--color-sub);
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+.googleBtn {
+  width: 100%;
+}
+
+.errorText {
+  margin: 16px 0 0;
+  color: var(--color-rose);
+  font-size: 13px;
+}

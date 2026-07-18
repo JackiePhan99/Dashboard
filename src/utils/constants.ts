@@ -27,7 +27,5 @@ export const SALE_COLORS = [
   "#5C8A3A",
 ] as const;
 
-// ============================================================
-// FONTS
-// ============================================================
-export const FONT_IMPORT = "@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');";
+// Font đã được khai báo tập trung ở src/styles/global.scss (import 1 lần ở main.jsx),
+// không cần định nghĩa lại ở đây nữa.
