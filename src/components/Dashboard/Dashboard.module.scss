@@ -16,14 +16,75 @@ $rose: #B4444B;
 $roseSoft: #F8E9EA;
 
 // ============================================================
+// GLOBAL RESET FOR VIEWPORT HEIGHT (Loại bỏ cuộn chính trên Desktop)
+// ============================================================
+:global {
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100%;
+    overflow: hidden; // Không cho phép cuộn toàn trang trên máy tính
+  }
+
+  // Khôi phục hành vi cuộn tự nhiên khi chuyển về màn hình Tablet / Điện thoại
+  @media (max-width: 1023px) {
+    html, body, #root {
+      overflow: auto;
+    }
+  }
+
+  // Bỏ hoàn toàn các đường viền đen/xanh khi click vào bất cứ vị trí nào trong biểu đồ
+  .recharts-wrapper,
+  .recharts-surface,
+  .recharts-sector,
+  .recharts-curve,
+  .recharts-active-dot,
+  .recharts-pie,
+  path,
+  svg,
+  g {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+}
+
+// ============================================================
 // MAIN CONTAINER
 // ============================================================
 .container {
   background: $bg;
-  min-height: 100%;
-  padding: 32px 32px 40px;
-  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
   color: $ink;
+}
+
+// Cấu hình chiều cao cố định cho màn hình Laptop và màn hình lớn trở lên
+@media (min-width: 1024px) {
+  .container {
+    height: 100vh;
+    min-height: 0;
+    padding: 24px;
+    overflow: hidden; // Ép vừa khít viewport
+  }
+}
+
+// Giới hạn chiều rộng hiển thị tối đa trên các màn hình cực đại (27 inch, 32 inch) để tránh kéo giãn quá mức
+@media (min-width: 1800px) {
+  .container {
+    max-width: 1800px;
+    margin: 0 auto;
+    border-left: 1px solid $border;
+    border-right: 1px solid $border;
+    box-shadow: 0 0 40px rgba(0,0,0,0.05);
+  }
 }
 
 // ============================================================
@@ -33,23 +94,17 @@ $roseSoft: #F8E9EA;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 28px;
+  margin-bottom: 4px;
   flex-wrap: wrap;
   gap: 12px;
 }
 
 .headerTitle {
   h1 {
-    font-size: 25px;
+    font-size: 24px;
     font-weight: 700;
     margin: 0;
     letter-spacing: -0.5px;
-  }
-
-  p {
-    color: $sub;
-    font-size: 13.5px;
-    margin: 5px 0 0;
   }
 }
 
@@ -59,26 +114,12 @@ $roseSoft: #F8E9EA;
   gap: 12px;
 }
 
-.userMenu {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-left: 12px;
-  border-left: 1px solid var(--color-border);
-}
-
-.userEmail {
-  font-size: 12.5px;
-  color: var(--color-sub);
-}
-
 .statusSync {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12.5px;
+  font-size: 12px;
   color: $faint;
-  font-family: 'IBM Plex Mono', monospace;
 }
 
 // ============================================================
@@ -90,7 +131,7 @@ $roseSoft: #F8E9EA;
   gap: 6px;
   padding: 6px 13px;
   border-radius: 999px;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -122,31 +163,48 @@ $roseSoft: #F8E9EA;
   border: 1px solid $border;
   border-radius: 16px;
   box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
-  padding: 20px 22px;
+  padding: 16px 20px;
 }
 
 .boxTitle {
   font-weight: 600;
-  font-size: 14.5px;
-  margin-bottom: 14px;
+  font-size: 14px;
+  margin-bottom: 12px;
   color: $ink;
   letter-spacing: -0.1px;
 }
 
 // ============================================================
-// METRIC BOX
+// METRICS ROW & RESPONSIVE GRID
 // ============================================================
-.metricBox {
-  flex: 1;
-  min-width: 190px;
-  background: $card;
-  border-radius: 16px;
-  border: 1px solid $border;
-  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
-  padding: 20px 22px;
+.metricsRow {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+}
+
+// Grid 2x2 cho Máy tính bảng
+@media (min-width: 640px) {
+  .metricsRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+// 4 Cột bằng nhau trên Laptop / Desktop trở lên
+@media (min-width: 1200px) {
+  .metricsRow {
+    display: flex;
+    flex-direction: row;
+    grid-template-columns: none;
+    gap: 16px;
+  }
+
+  .metricBoxSplit {
+    flex: 1; // Đảm bảo cả 4 block có bề rộng bằng nhau hoàn hảo
+    min-width: 0;
+  }
 }
 
 .metricIcon {
@@ -158,55 +216,63 @@ $roseSoft: #F8E9EA;
   justify-content: center;
 }
 
-.metricContent {
-  display: flex;
-  flex-direction: column;
-}
-
 .metricLabel {
-  font-size: 12.5px;
+  font-size: 11px;
   color: $sub;
   font-weight: 600;
-  margin-bottom: 5px;
+  margin-bottom: 0px !important; // Khử hoàn toàn margin-bottom để đồng nhất vị trí thẳng hàng 100%
   letter-spacing: 0.2px;
 }
 
-.metricValue {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 23px;
-  font-weight: 700;
-  color: $ink;
-  letter-spacing: -0.3px;
+// Con số hiển thị đồng bộ tuyệt đối về kích thước & phông chữ
+.unifiedValue {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 19px !important; 
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  color: $ink !important;
+  letter-spacing: -0.3px !important;
 }
 
 // ============================================================
-// METRICS ROW
+// BLOCK THẺ CHIA ĐÔI TIÊU CHUẨN
 // ============================================================
-.metricsRow {
+.metricBoxSplit {
+  background: $card;
+  border-radius: 16px;
+  border: 1px solid $border;
+  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.splitContent {
   display: flex;
   gap: 16px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
-// ============================================================
-// KPI BOX
-// ============================================================
-.kpiBox {
+.splitCol {
   flex: 1;
-  min-width: 230px;
-  padding: 18px 20px;
-  background: $card;
-  border: 1px solid $border;
-  border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
+.splitDivider {
+  width: 1px;
+  background: $border;
+  align-self: stretch;
+  margin: 4px 0;
+}
+
+// KPI EDIT
 .kpiHeader {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
 }
 
 .kpiIcon {
@@ -220,72 +286,238 @@ $roseSoft: #F8E9EA;
 }
 
 .kpiLabel {
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: $sub;
   font-weight: 600;
   letter-spacing: 0.2px;
 }
 
-.kpiContent {
+.kpiValueRow {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
 }
 
-.kpiMetric {
-  flex: 1;
-  background: $bg;
-  border-radius: 10px;
-  padding: 10px 8px;
-  text-align: center;
+.kpiEditRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
 }
 
-.kpiMetricLabel {
-  font-size: 11px;
-  color: $sub;
-  margin-bottom: 4px;
-}
-
-.kpiMetricValue {
-  font-size: 19px;
+.kpiInlineInput {
+  width: 100%;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13.5px;
   font-weight: 700;
+  color: $ink;
+  background: $bg;
+  outline: none;
+  font-family: inherit;
+
+  &:focus {
+    border-color: $teal;
+  }
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+.kpiSaveButton {
+  background: $teal;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.kpiEditButtonCorner {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $sub;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $border;
+    color: $ink;
+  }
+}
+
+// Khung nhập liệu
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-top: 6px;
+  margin-bottom: 4px;
+  transition: border-color 0.15s ease;
+
+  &:focus-within {
+    border-color: $teal;
+  }
+
+  input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 700;
+    color: $ink;
+    outline: none;
+    padding: 0;
+    
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield;
+  }
+
+  span {
+    font-size: 12px;
+    color: $sub;
+    font-weight: 600;
+  }
 }
 
 // ============================================================
-// CHARTS ROW
+// CHARTS & RESPONSIVE ROW
 // ============================================================
 .chartsRow {
   display: flex;
+  flex-direction: column;
   gap: 16px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
 }
 
-.chartBox {
-  background: $card;
-  border: 1px solid $border;
-  border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(20, 20, 30, 0.03), 0 8px 20px -12px rgba(20, 20, 30, 0.06);
+@media (min-width: 1024px) {
+  .chartsRow {
+    flex: 1.1; // Tự động co giãn theo chiều dọc trên máy tính
+    min-height: 0;
+    flex-direction: row;
+  }
 
-  // Allow pie labels to overflow a bit without being clipped
-  overflow: visible;
+  .chartBox {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .areaChart {
+    flex: 2;
+    min-width: 0;
+  }
+
+  .pieChart {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
-.areaChart {
-  flex: 2;
-  min-width: 360px;
-  padding: 20px 22px;
-}
-
-.pieChart {
+// Container bọc trong của Biểu đồ để đồng nhất Recharts co giãn chiều cao
+.chartWrapper {
   flex: 1;
-  min-width: 270px;
-  padding: 20px 22px;
+  width: 100%;
+  min-height: 240px; // Chiều cao mặc định đẹp mắt khi xem trên điện thoại
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .chartWrapper {
+    min-height: 0; // Để flexbox của container máy tính tự điều chỉnh
+  }
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chartToggleGroup {
+  display: flex;
+  background: $bg;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid $border;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  color: $sub;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+.toggleBtnActive {
+  background: $card;
+  color: $ink;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .pieWrapper {
   display: flex;
-  align-items: center;
+  align-items: stretch; // Chuyển từ center sang stretch để ép cột con căng chiều cao 100%
   gap: 12px;
+  width: 100%;
+  min-height: 240px; 
+}
+
+@media (min-width: 1024px) {
+  .pieWrapper {
+    flex: 1; 
+    min-height: 0;
+    height: 100%;
+    
+    // Đảm bảo khung chứa biểu đồ con bên trong kéo căng chiều cao 100%
+    .chartWrapper {
+      height: 100%;
+    }
+  }
 }
 
 .pieLegend {
@@ -293,15 +525,10 @@ $roseSoft: #F8E9EA;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  justify-content: center; // Căn dọc ở giữa để cân đối
 }
 
-.pieChart svg {
-  overflow: visible;
-}
-
-// ============================================================
-// MONTHLY CHART TOOLTIP (Doanh thu / Gross profit)
-// ============================================================
+// Monthly Chart Tooltip
 .monthlyTooltip {
   background: $card;
   border: 1px solid $border;
@@ -339,15 +566,32 @@ $roseSoft: #F8E9EA;
 }
 
 // ============================================================
-// TABLE
+// TABLE (Cố định tiêu đề bảng & tự động thanh cuộn nội bộ)
 // ============================================================
 .tableBox {
-  padding: 20px 22px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .tableBox {
+    flex: 0.9; // Tự động co giãn theo chiều dọc trên máy tính
+    min-height: 0;
+  }
 }
 
 .tableContainer {
-  max-height: 280px;
+  width: 100%;
+  overflow-x: auto;
   overflow-y: auto;
+}
+
+@media (min-width: 1024px) {
+  .tableContainer {
+    flex: 1;
+    min-height: 0; // Kích hoạt cơ chế cuộn mượt nội bộ
+  }
 }
 
 .table {
@@ -364,9 +608,15 @@ $roseSoft: #F8E9EA;
   letter-spacing: 0.4px;
 }
 
+// Tiêu đề bảng cố định (sticky) khi scroll
 .tableHeadCell {
-  padding: 0 8px 10px;
+  position: sticky;
+  top: 0;
+  background: $card !important; 
+  z-index: 10;
+  padding: 10px 8px;
   font-weight: 600;
+  box-shadow: inset 0 -1px 0 $border; 
 }
 
 .tableHeadCellRight {
@@ -384,25 +634,25 @@ $roseSoft: #F8E9EA;
 }
 
 .tableCellIndex {
-  padding: 10px 8px;
+  padding: 8px;
   color: $faint;
   font-size: 12.5px;
 }
 
 .tableCellCustomer {
-  padding: 10px 8px;
+  padding: 8px;
   font-weight: 600;
 }
 
 .tableCellRevenue {
-  padding: 10px 8px;
+  padding: 8px;
   text-align: right;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important; 
   font-size: 13px;
 }
 
 .tableCellBar {
-  padding: 10px 8px;
+  padding: 8px;
 }
 
 .barBackground {
@@ -449,8 +699,5 @@ $roseSoft: #F8E9EA;
   line-height: 1.7;
   max-width: 480px;
   margin: 0 auto;
-
-  code {
-    font-family: 'IBM Plex Mono', monospace;
-  }
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
 }

@@ -2,17 +2,11 @@
 // CSV PARSING & DATA UTILITIES
 // ============================================================
 
-// Vị trí cột cố định theo đúng sheet thật (0-based: A=0, B=1, C=2 ...)
-// B=1 Số Hợp đồng/PO · D=3 Tên công ty/đối tác · E=4 Ngày ký HĐ · G=6 Tháng (cột có sẵn, không phải cột ẩn)
-// J=9 Giá trị HĐ (Gồm VAT) Pre · K=10 Giá trị HĐ (Chưa VAT) Pre · L=11 VAT Pre · M=12 Gross Profit Pre
-// N=13 BD PIC
-// O=14 Giá trị HĐ (Gồm VAT) Post · P=15 Giá trị HĐ (Chưa VAT) Post · Q=16 VAT Post · R=17 Gross Profit Post
 export const CSV_COLUMN_INDEXES = {
   orderId: 0,
-  po: 1,                 // B — Số Hợp đồng/PO (dùng để nhận diện deal "Cancel")
   company: 3,
   signDate: 4,
-  month: 6,               // G — Tháng (cột có sẵn trong sheet, ưu tiên dùng thay vì tự parse ngày)
+  month: 6,               // G — Tháng
   preNetVat: 10,        // K — Giá trị HĐ (Chưa VAT), Pre PNL
   preGrossProfit: 12,    // M — Gross Profit, Pre PNL
   bdPic: 13,             // N — BD PIC
@@ -22,36 +16,63 @@ export const CSV_COLUMN_INDEXES = {
 
 export const DATA_START_ROW = 3;
 
-export function splitCSVLine(line: string) {
-  const out: string[] = [];
-  let cur = "", inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') inQ = !inQ;
-    else if (c === "," && !inQ) { out.push(cur); cur = ""; }
-    else cur += c;
+export function parseCSV(text: string): string[][] {
+  const result: string[][] = [];
+  let row: string[] = [];
+  let currField = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currField += '"';
+        i++; 
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      row.push(currField);
+      currField = "";
+    } else if ((char === '\n' || char === '\r') && !inQuotes) {
+      row.push(currField);
+      result.push(row);
+      row = [];
+      currField = "";
+      if (char === '\r' && nextChar === '\n') {
+        i++; 
+      }
+    } else {
+      currField += char;
+    }
   }
-  out.push(cur);
-  return out.map((s) => s.trim());
+
+  if (row.length > 0 || currField !== "") {
+    row.push(currField);
+    result.push(row);
+  }
+
+  return result;
 }
 
 export function num(v: unknown) {
   if (v === null || v === undefined) return 0;
   let s = String(v).replace(/[đ₫]/gi, "").trim();
-  s = s.replace(/\./g, "");   // bỏ dấu chấm ngăn cách hàng nghìn kiểu VN
-  s = s.replace(/,/g, ".");   // nếu có dấu phẩy dùng như thập phân
+  s = s.replace(/\./g, "");   
+  s = s.replace(/,/g, ".");   
   s = s.replace(/[^0-9.\-]/g, "");
   const n = Number(s);
   return isNaN(n) ? 0 : n;
 }
 
 export function parseSheet(csvText: string, columnIndexes = CSV_COLUMN_INDEXES, dataStartRow = DATA_START_ROW) {
-  const lines = csvText.replace(/\r/g, "").split("\n");
-  if (lines.length <= dataStartRow) return [];
+  const allRows = parseCSV(csvText);
+  if (allRows.length <= dataStartRow) return [];
 
   const rows = [] as Array<{
     id: string;
-    po: string;
     company: string;
     signDate: string;
     month: number | null;
@@ -62,22 +83,18 @@ export function parseSheet(csvText: string, columnIndexes = CSV_COLUMN_INDEXES, 
     grossPost: number;
   }>;
 
-  for (let i = dataStartRow; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
-    const cells = splitCSVLine(lines[i]);
-    const company = (cells[columnIndexes.company] || "").trim();
-    if (!company) continue;
+  for (let i = dataStartRow; i < allRows.length; i++) {
+    const cells = allRows[i];
+    if (!cells || cells.length === 0) continue;
 
-    const po = (cells[columnIndexes.po] || "").trim();
-    // Loại các deal đã huỷ (PO ghi rõ "Cancel"), giữ lại các deal khác kể cả loại "Special"
-    if (/cancel/i.test(po)) continue;
+    const company = (cells[columnIndexes.company] || "").trim();
+    if (!company) continue; // Bỏ qua dòng trống hoàn toàn (ở cuối trang tính)
 
     const monthRaw = parseInt((cells[columnIndexes.month] || "").trim(), 10);
     const month = monthRaw >= 1 && monthRaw <= 12 ? monthRaw : null;
 
     rows.push({
       id: (cells[columnIndexes.orderId] || "").trim(),
-      po,
       company,
       signDate: cells[columnIndexes.signDate] || "",
       month,
