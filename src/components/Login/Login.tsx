@@ -1,8 +1,8 @@
+import { useState } from "react";
+import { Mail, Lock, User as UserIcon, Loader2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import styles from "./Login.module.scss";
 
-// Icon Google chính thức (4 màu), giữ nguyên màu gốc nên vẽ trực tiếp bằng SVG
-// thay vì dùng icon 1 màu từ lucide-react.
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
@@ -15,26 +15,98 @@ function GoogleIcon() {
 }
 
 export default function Login() {
-  const { signInWithGoogle, loading, error } = useAuth();
+  const { signInWithGoogle, signInWithEmail, resetPassword, loading, error } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+    setSubmitting(true);
+    setResetSent(false);
+    await signInWithEmail(email, password, rememberMe);
+    setSubmitting(false);
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) return;
+    setResetSent(false);
+    try {
+      await resetPassword(email);
+      setResetSent(true);
+    } catch {
+      // lỗi đã được đưa vào `error` bởi AuthContext
+    }
+  };
 
   return (
     <div className={styles.wrapper}>
-      <div className={`card ${styles.panel}`}>
-        <div className={styles.logo}>DB</div>
-        <h1 className={styles.title}>Đăng nhập</h1>
-        <p className={styles.subtitle}>Đăng nhập bằng tài khoản Google để tiếp tục vào báo cáo</p>
+      <div className={styles.panel}>
+        <div className={styles.avatar}>
+          <UserIcon size={40} strokeWidth={1.5} />
+        </div>
 
-        <button
-          type="button"
-          className={`btn ${styles.googleBtn}`}
-          onClick={signInWithGoogle}
-          disabled={loading}
-        >
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.field}>
+            <Mail size={16} className={styles.fieldIcon} />
+            <input
+              type="email"
+              placeholder="Email ID"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="username"
+              required
+            />
+          </div>
+
+          <div className={styles.field}>
+            <Lock size={16} className={styles.fieldIcon} />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+          </div>
+
+          <div className={styles.row}>
+            <label className={styles.remember}>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              Remember me
+            </label>
+            <button type="button" className={styles.forgotLink} onClick={handleForgotPassword}>
+              Forgot Password?
+            </button>
+          </div>
+
+          {resetSent && (
+            <p className={styles.infoText}>Đã gửi email đặt lại mật khẩu, kiểm tra hộp thư của bạn.</p>
+          )}
+          {error && <p className={styles.errorText}>{error}</p>}
+
+          <button type="submit" className={styles.loginBtn} disabled={submitting || loading}>
+            {submitting ? <Loader2 size={16} className={styles.spin} /> : "LOGIN"}
+          </button>
+        </form>
+
+        <div className={styles.divider}>
+          <span>hoặc</span>
+        </div>
+
+        <button type="button" className={styles.googleBtn} onClick={signInWithGoogle} disabled={loading}>
           <GoogleIcon />
-          {loading ? "Đang kiểm tra phiên đăng nhập..." : "Đăng nhập bằng Google"}
+          Đăng nhập bằng Google
         </button>
-
-        {error && <p className={styles.errorText}>{error}</p>}
       </div>
     </div>
   );

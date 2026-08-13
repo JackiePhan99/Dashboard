@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   ComposedChart, Area, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
-import { RefreshCw, CheckCircle2, AlertCircle, Link2, Wallet, Receipt, TrendingUp, Percent, Pencil } from "lucide-react";
+import { RefreshCw, CheckCircle2, AlertCircle, Link2, Wallet, Receipt, TrendingUp, Percent, Pencil, ChevronDown } from "lucide-react";
 import styles from "./Dashboard.module.scss";
 import { PALETTE, SALE_COLORS } from "../../utils/constants";
 import { parseSheet } from "../../utils/csvParser";
@@ -58,6 +58,9 @@ function Box({ children, style, title, className }: { children: React.ReactNode;
 
 export default function PnlDashboard() {
   const { user, signOut } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
   const [rows, setRows] = useState<Array<{
     id: string;
     company: string;
@@ -220,6 +223,24 @@ export default function PnlDashboard() {
     };
   }, [rows]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleMenu = () => setIsMenuOpen(prev => !prev);
+
+  const getUserName = (email: string | null) => {
+    const cleaned = email || "";
+    const namePart = cleaned.split("@")[0];
+    return namePart ? namePart.charAt(0).toUpperCase() + namePart.slice(1) : "Người dùng";
+  };
+
   const yAxisTicks = useMemo(() => {
     if (!stats || !stats.monthlyData.length) return { ticks: [], max: 0 };
     const maxVal = Math.max(...stats.monthlyData.map(d => d.doanh_thu));
@@ -249,18 +270,32 @@ export default function PnlDashboard() {
       <div className={styles.header}>
         <div className={styles.headerTitle}>
           <h1>Báo cáo doanh thu &amp; KPI</h1>
-          <StatusPill status={status} />
-          {status === "live" && (
-            <div className={styles.statusSync}>
-              <RefreshCw size={13} /> {fmtTime(lastSync)}
-            </div>
-          )}
+          <div className={styles.statusRow}>
+            <StatusPill status={status} />
+            {status === "live" && (
+              <button type="button" className={styles.statusSync} onClick={fetchData}>
+                <RefreshCw size={13} /> {fmtTime(lastSync)}
+              </button>
+            )}
+          </div>
         </div>
         <div className={styles.headerRight}>
           {user && (
-            <div className={styles.userMenu}>
-              <span className={styles.userEmail}>{user.email}</span>
-              <button type="button" className="btn" onClick={signOut}>Đăng xuất</button>
+            <div className={styles.userMenu} ref={menuRef}>
+              <button type="button" className={styles.userCard} onClick={toggleMenu} aria-haspopup="true" aria-expanded={isMenuOpen}>
+                <div>
+                  <div className={styles.userName}>{getUserName(user.email || "")}</div>
+                  <div className={styles.userEmail}>{user.email || ""}</div>
+                </div>
+                <ChevronDown size={18} />
+              </button>
+              {isMenuOpen && (
+                <div className={styles.dropdownMenu}>
+                  <button type="button" className={styles.dropdownItem}>Tài khoản của tôi</button>
+                  <button type="button" className={styles.dropdownItem}>Cài đặt</button>
+                  <button type="button" className={styles.dropdownItem} onClick={signOut}>Đăng xuất</button>
+                </div>
+              )}
             </div>
           )}
         </div>

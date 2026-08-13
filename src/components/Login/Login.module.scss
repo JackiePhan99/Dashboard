@@ -4,49 +4,199 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
+
+  // Nền gradient nhiều màu mờ ảo, giống ảnh mẫu
+  background: radial-gradient(circle at 20% 20%, #4a1e3d 0%, transparent 45%),
+    radial-gradient(circle at 80% 10%, #3a2255 0%, transparent 40%),
+    radial-gradient(circle at 15% 80%, #2f2a5c 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, #5b3a63 0%, transparent 45%),
+    linear-gradient(135deg, #1a1425 0%, #241b38 50%, #1a1425 100%);
 }
 
 .panel {
   width: 100%;
-  max-width: 380px;
-  padding: 40px 32px;
-  text-align: center;
+  max-width: 360px;
+  padding: 36px 32px 32px;
+  border-radius: 24px;
+
+  // Kính mờ: nền trắng bán trong suốt + blur nội dung phía sau
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
 
-.logo {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 20px;
-  border-radius: var(--radius-md);
-  background: var(--color-ink);
-  color: #fff;
+.avatar {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.title {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0 0 8px;
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
-.subtitle {
-  color: var(--color-sub);
+.field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+
+  &:focus-within {
+    border-bottom-color: rgba(255, 255, 255, 0.8);
+  }
+
+  input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 14.5px;
+    font-family: inherit;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.55);
+    }
+  }
+}
+
+.fieldIcon {
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -6px;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+
+  input {
+    accent-color: #fff;
+    cursor: pointer;
+  }
+}
+
+.forgotLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+
+  &:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
+}
+
+.errorText {
+  margin: -8px 0 0;
+  font-size: 12.5px;
+  color: #ffb4b4;
+}
+
+.infoText {
+  margin: -8px 0 0;
+  font-size: 12.5px;
+  color: #b8e6c4;
+}
+
+.loginBtn {
+  height: 46px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #4a2e6b 0%, #2e2352 100%);
+  color: #fff;
   font-size: 13.5px;
-  line-height: 1.6;
-  margin: 0 0 28px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.15s ease, opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.15);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 18px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
 .googleBtn {
   width: 100%;
-}
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.9);
+  color: #1f1f1f;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.15s ease, opacity 0.15s ease;
 
-.errorText {
-  margin: 16px 0 0;
-  color: var(--color-rose);
-  font-size: 13px;
+  &:hover:not(:disabled) {
+    background: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 }
