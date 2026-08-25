@@ -11,4 +11,4 @@ export const AUTH_ENABLED = false;
 // Google không thuộc domain này). Đăng nhập bằng Email/Mật khẩu KHÔNG bị
 // giới hạn bởi domain này, dùng để tạo tài khoản phụ cho khách xem báo cáo
 // (tạo thủ công trong Firebase Console → Authentication → Users → Add user).
-export const COMPANY_DOMAIN = "themiracle.com";
+export const COMPANY_DOMAIN = "themiracle.vn";

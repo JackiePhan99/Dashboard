@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const email = result.user.email || "";
       if (!email.toLowerCase().endsWith(`@${COMPANY_DOMAIN.toLowerCase()}`)) {
         await firebaseSignOut(auth);
-        setError(`Chỉ chấp nhận tài khoản Google thuộc domain @${COMPANY_DOMAIN}. Dùng đăng nhập Email/Mật khẩu nếu bạn là tài khoản khách.`);
+        setError(`Hệ thống chỉ hỗ trợ đăng nhập bằng tài khoản nội bộ công ty.`);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Đăng nhập thất bại, thử lại sau.");

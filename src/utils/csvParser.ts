@@ -7,11 +7,13 @@ export const CSV_COLUMN_INDEXES = {
   company: 3,
   signDate: 4,
   month: 6,               // G — Tháng
+  projectName: 7,         // H — Project Name (tên job/dự án)
   preNetVat: 10,        // K — Giá trị HĐ (Chưa VAT), Pre PNL
   preGrossProfit: 12,    // M — Gross Profit, Pre PNL
   bdPic: 13,             // N — BD PIC
   postNetVat: 15,        // P — Giá trị HĐ (Chưa VAT), Post PNL
   postGrossProfit: 17,   // R — Gross Profit, Post PNL
+  accountPic: 19,         // T — Account PIC
 } as const;
 
 export const DATA_START_ROW = 3;
@@ -76,7 +78,9 @@ export function parseSheet(csvText: string, columnIndexes = CSV_COLUMN_INDEXES, 
     company: string;
     signDate: string;
     month: number | null;
+    projectName: string;
     bd: string;
+    accountPic: string;
     netPre: number;
     netPost: number;
     grossPre: number;
@@ -98,7 +102,9 @@ export function parseSheet(csvText: string, columnIndexes = CSV_COLUMN_INDEXES, 
       company,
       signDate: cells[columnIndexes.signDate] || "",
       month,
+      projectName: (cells[columnIndexes.projectName] || "").trim(),
       bd: ((cells[columnIndexes.bdPic] || "").trim().replace(/\s+/g, " ")) || "Chưa rõ",
+      accountPic: ((cells[columnIndexes.accountPic] || "").trim().replace(/\s+/g, " ")) || "Chưa rõ",
       netPre: num(cells[columnIndexes.preNetVat]),
       netPost: num(cells[columnIndexes.postNetVat]),
       grossPre: num(cells[columnIndexes.preGrossProfit]),

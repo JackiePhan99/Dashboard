@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   ComposedChart, Area, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -6,8 +6,8 @@ import {
 import { RefreshCw, CheckCircle2, AlertCircle, Link2, Wallet, Receipt, TrendingUp, Percent, Pencil, ChevronDown } from "lucide-react";
 import styles from "./Dashboard.module.scss";
 import { PALETTE, SALE_COLORS } from "../../utils/constants";
-import { parseSheet } from "../../utils/csvParser";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSheetData } from "../../hooks/useSheetData";
 
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmsAsX0kXlO5WF90XkzpqbgWsFuaqtXAAkrdt-t0lwcJB2QdtoxIw5ork8BypMpKiaZbtOErhSA57l/pub?gid=1482763963&single=true&output=csv";
 const POLL_INTERVAL_MS = 20000;
@@ -56,24 +56,12 @@ function Box({ children, style, title, className }: { children: React.ReactNode;
   );
 }
 
-export default function PnlDashboard() {
+export const Dashboard = () => {
   const { user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  const [rows, setRows] = useState<Array<{
-    id: string;
-    company: string;
-    signDate: string;
-    month: number | null;
-    bd: string;
-    netPre: number;
-    netPost: number;
-    grossPre: number;
-    grossPost: number;
-  }>>([]);
-  const [status, setStatus] = useState("not_connected");
-  const [lastSync, setLastSync] = useState<Date | null>(null);
+  const { rows, status, lastSync, refetch } = useSheetData();
 
   // State quản lý việc sửa KPI mục tiêu
   const [kpiTarget, setKpiTarget] = useState<number>(() => {
@@ -90,41 +78,6 @@ export default function PnlDashboard() {
     setKpiTarget(val);
     localStorage.setItem("pnl_kpi_target", String(val));
   };
-
-  const fetchData = useCallback(async () => {
-    if (!SHEET_CSV_URL.trim()) {
-      setStatus("not_connected");
-      return;
-    }
-    try {
-      const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
-      if (!res.ok) throw new Error("fetch failed");
-      const text = await res.text();
-
-      const looksLikeHtml = /^\s*<(!doctype|html)/i.test(text) || text.includes("DOCS_timingPromises");
-      if (looksLikeHtml) {
-        setStatus("not_public");
-        return;
-      }
-
-      const parsed = parseSheet(text);
-      if (!parsed.length) {
-        setStatus("empty");
-        return;
-      }
-      setRows(parsed);
-      setStatus("live");
-      setLastSync(new Date());
-    } catch {
-      setStatus("error");
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-    const id = window.setInterval(fetchData, POLL_INTERVAL_MS);
-    return () => window.clearInterval(id);
-  }, [fetchData]);
 
   const stats = useMemo(() => {
     if (!rows.length) return null;
@@ -273,7 +226,7 @@ export default function PnlDashboard() {
           <div className={styles.statusRow}>
             <StatusPill status={status} />
             {status === "live" && (
-              <button type="button" className={styles.statusSync} onClick={fetchData}>
+              <button type="button" className={styles.statusSync} onClick={refetch}>
                 <RefreshCw size={13} /> {fmtTime(lastSync)}
               </button>
             )}
@@ -292,7 +245,6 @@ export default function PnlDashboard() {
               {isMenuOpen && (
                 <div className={styles.dropdownMenu}>
                   <button type="button" className={styles.dropdownItem}>Tài khoản của tôi</button>
-                  <button type="button" className={styles.dropdownItem}>Cài đặt</button>
                   <button type="button" className={styles.dropdownItem} onClick={signOut}>Đăng xuất</button>
                 </div>
               )}

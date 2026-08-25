@@ -1,0 +1,194 @@
+.container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 100vh;
+  color: #1e293b;
+  font-family: inherit;
+}
+
+// --- Header ---
+.header {
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+// --- Profile Card ---
+.profileCard {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin-bottom: 20px;
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 24px;
+
+  .avatarLg {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+  }
+
+  .titleGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .verifiedBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid rgba(5, 150, 105, 0.2);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+  }
+
+  .emailSub {
+    font-size: 14px;
+    color: #64748b;
+    margin: 4px 0 0 0;
+  }
+}
+
+// --- Info Grid ---
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .valueBox {
+    padding: 12px 14px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .iconCheck {
+      color: #10b981;
+    }
+  }
+}
+
+// --- Security Card ---
+.securityCard {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+
+  .cardTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+
+    svg {
+      color: #6366f1;
+    }
+  }
+
+  .cardDesc {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 16px 0;
+  }
+
+  .statusBox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background-color: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+
+    .statusLeft {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #10b981;
+      }
+
+      span {
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+      }
+    }
+
+    .badgeActive {
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+  }
+}

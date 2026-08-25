@@ -14,7 +14,7 @@ function GoogleIcon() {
   );
 }
 
-export default function Login() {
+export const Login = () => {
   const { signInWithGoogle, signInWithEmail, resetPassword, loading, error } = useAuth();
 
   const [email, setEmail] = useState("");
